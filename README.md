@@ -12,7 +12,7 @@ We are interested in the supervised domain adaptation when very few labeled targ
 Experimental setting involves randomly selecting 2000 images from MNIST and 1800 images from USPS. Here, we randomly selected n labeled samples per class from target domain data and used them in training. We evaluated our approach for n ranging from 1 to 7 and repeated each experiment 10 times. Therefore, we provided data we used to generate the results. Data files are located in the 'row_data' subdirectory.
 
 
-### "We encourage the researchers to use this data for comparison."
+### "We encourage researchers to use this data for comparison."
 
 
 
@@ -20,30 +20,23 @@ Experimental setting involves randomly selecting 2000 images from MNIST and 1800
 
 To reproduce the results of the paper you just need to run main.py. There are three main parameters:
 
-sample_per_class = 1 or 2 or ... or 7
-sample_per_class specifies the number of labeled target data per class.
+1. sample_per_class = 1 or 2 or ... or 7 (sample_per_class specifies the number of labeled target data per class.)
 
-repetition =  0 or 2 or ... or 9
-we repeat the experiments 10 times and report the average accuracies.
+2. repetition =  0 or 2 or ... or 9. (We repeat the experiments 10 times and report the average accuracies.)
 
-domain_adaptation_task = 'MNIST_to_USPS' or 'USPS_to_MNIST'
+3. domain_adaptation_task = 'MNIST_to_USPS' or 'USPS_to_MNIST'
 
 
-There are some other hyperparameter that you may change for the new dataset.
+There are some other hyperparameters that you may change for the new dataset.
 
 
 ## Citation
 
 @InProceedings{motiian2017CCSA,
   Title                    = {Unified Deep Supervised Domain Adaptation and Generalization},
-  
   Author                   = {Motiian, Saeid and Piccirilli, Marco and Adjeroh, Donald A. and Doretto, Gianfranco},
-  
   Booktitle                = {IEEE International Conference on Computer Vision (ICCV)},
-  
-  Year                     = {2017}
-  
- }
+  Year                     = {2017}}
  
  
  
