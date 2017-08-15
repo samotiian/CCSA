@@ -53,7 +53,7 @@ model.compile(loss={'classification': 'categorical_crossentropy', 'CSA': Initial
 
 
 
-
+print 'Domain Adaptation Task: ' + domain_adaptation_task
 # let's create the positive and negative pairs using row data.
 # pairs will be saved in ./pairs directory
 sample_per_class=1

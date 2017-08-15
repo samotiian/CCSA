@@ -33,9 +33,12 @@ There are some other hyperparameters that you may change for the new dataset.
 ## Citation
 
 @InProceedings{motiian2017CCSA,
-  Title                    = {Unified Deep Supervised Domain Adaptation and Generalization}, \n
-  Author                   = {Motiian, Saeid and Piccirilli, Marco and Adjeroh, Donald A. and Doretto, Gianfranco},\n
+  Title                    = {Unified Deep Supervised Domain Adaptation and Generalization},
+
+  Author                   = {Motiian, Saeid and Piccirilli, Marco and Adjeroh, Donald A. and Doretto, Gianfranco},
+
   Booktitle                = {IEEE International Conference on Computer Vision (ICCV)},
+
   Year                     = {2017}}
  
  
