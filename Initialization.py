@@ -110,8 +110,8 @@ def Create_Model():
     model.add(Flatten())
     model.add(Dense(120))
     model.add(Activation('relu'))
-    # model.add(Dense(84))
-    # model.add(Activation('relu'))
+    model.add(Dense(84))
+    model.add(Activation('relu'))
     return model
 
 
