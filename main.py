@@ -6,15 +6,6 @@ from tensorflow.compat.v2.keras.models import Model
 # let's assume MNIST->USPS task.
 domain_adaptation_task = 'MNIST_to_USPS'   # USPS_to_MNIST is also another option.
 
-# let's run the experiments when 1 target sample per calss is available in training.
-# you can run the experiments for sample_per_class=1, ... , 7.
-sample_per_class = 1
-
-# Running the experiments for repetition 5. In the paper we reported the average acuracy.
-# We run the experiments for repetition=0,...,9 and take the average
-repetition = 2
-
-
 # Creating embedding function. This corresponds to the function g in the paper.
 # You may need to change the network parameters.
 model1=Initialization.Create_Model()
@@ -52,16 +43,16 @@ distance = Lambda(Initialization.euclidean_distance, output_shape=Initialization
 print('Domain Adaptation Task: ' + domain_adaptation_task)
 # let's create the positive and negative pairs using row data.
 # pairs will be saved in ./pairs directory
-sample_per_class=1
-for repetition in range(10):
-    model = Model(inputs=[input_a, input_b], outputs=[out1, distance])
-    model.compile(loss={'classification': 'categorical_crossentropy', 'CSA': Initialization.contrastive_loss},
-                optimizer='adadelta',
-                loss_weights={'classification': 1 - alpha, 'CSA': alpha})
-    Initialization.Create_Pairs(domain_adaptation_task,repetition,sample_per_class)
-    Acc=Initialization.training_the_model(model,domain_adaptation_task,repetition,sample_per_class)
+for sample_per_class in [1,3,5,7]:
+    for repetition in range(10):
+        model = Model(inputs=[input_a, input_b], outputs=[out1, distance])
+        model.compile(loss={'classification': 'categorical_crossentropy', 'CSA': Initialization.contrastive_loss},
+                    optimizer='adadelta',
+                    loss_weights={'classification': 1 - alpha, 'CSA': alpha})
+        Initialization.Create_Pairs(domain_adaptation_task,repetition,sample_per_class)
+        Acc=Initialization.training_the_model(model,domain_adaptation_task,repetition,sample_per_class)
 
-    print('Best accuracy for {} target sample per class and repetition {} is {}.'.format(sample_per_class,repetition,Acc ))
+        print('Best accuracy for {} target sample per class and repetition {} is {}.'.format(sample_per_class,repetition,Acc ))
 
 
 
