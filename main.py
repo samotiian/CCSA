@@ -45,10 +45,6 @@ out1 = Activation('softmax', name='classification')(out1)
 
 distance = Lambda(Initialization.euclidean_distance, output_shape=Initialization.eucl_dist_output_shape, name='CSA')(
     [processed_a, processed_b])
-model = Model(inputs=[input_a, input_b], outputs=[out1, distance])
-model.compile(loss={'classification': 'categorical_crossentropy', 'CSA': Initialization.contrastive_loss},
-              optimizer='adadelta',
-              loss_weights={'classification': 1 - alpha, 'CSA': alpha})
 
 
 
@@ -58,6 +54,10 @@ print('Domain Adaptation Task: ' + domain_adaptation_task)
 # pairs will be saved in ./pairs directory
 sample_per_class=1
 for repetition in range(10):
+    model = Model(inputs=[input_a, input_b], outputs=[out1, distance])
+    model.compile(loss={'classification': 'categorical_crossentropy', 'CSA': Initialization.contrastive_loss},
+                optimizer='adadelta',
+                loss_weights={'classification': 1 - alpha, 'CSA': alpha})
     Initialization.Create_Pairs(domain_adaptation_task,repetition,sample_per_class)
     Acc=Initialization.training_the_model(model,domain_adaptation_task,repetition,sample_per_class)
 
