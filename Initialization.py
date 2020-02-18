@@ -1,12 +1,12 @@
 import random
 import os
 
-from keras.utils import np_utils
-from keras.models import Sequential, Model
-from keras.layers import Input, Lambda, Convolution2D, MaxPooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense
-from keras.optimizers import SGD, RMSprop, Adam, Adadelta, Nadam
-from keras import backend as K
+from tensorflow.compat.v2.keras.utils import to_categorical
+from tensorflow.compat.v2.keras.models import Sequential, Model
+from tensorflow.compat.v2.keras.layers import Input, Lambda, Convolution2D, MaxPooling2D
+from tensorflow.compat.v2.keras.layers import Activation, Dropout, Flatten, Dense
+from tensorflow.compat.v2.keras.optimizers import SGD, RMSprop, Adam, Adadelta, Nadam
+from tensorflow.compat.v2.keras import backend as K
 import numpy   as np
 import sys
 
@@ -33,7 +33,7 @@ def Create_Pairs(domain_adaptation_task,repetition,sample_per_class):
             raise Exception('number of sample_per_class should be between 1 and 7.')
 
 
-    print 'Creating pairs for repetition: '+str(cc)+' and sample_per_class: '+str(sample_per_class)
+    print('Creating pairs for repetition: '+str(cc)+' and sample_per_class: '+str(sample_per_class))
 
     X_train_target=np.load('./row_data/' + UM + '_X_train_target_repetition_' + str(cc) + '_sample_per_class_' + str(SpC) + '.npy')
     y_train_target=np.load('./row_data/' + UM + '_y_train_target_repetition_' + str(cc) + '_sample_per_class_' + str(SpC) + '.npy')
@@ -156,7 +156,7 @@ def training_the_model(model,domain_adaptation_task,repetition,sample_per_class)
     X_test = np.load('./row_data/' + UM + '_X_test_target_repetition_' + str(cc) + '_sample_per_class_' + str(SpC)+'.npy')
     y_test = np.load('./row_data/' + UM + '_y_test_target_repetition_' + str(cc) + '_sample_per_class_' + str(SpC)+'.npy')
     X_test = X_test.reshape(X_test.shape[0], 16, 16, 1)
-    y_test = np_utils.to_categorical(y_test, nb_classes)
+    y_test = to_categorical(y_test, nb_classes)
 
 
     X1 = np.load('./pairs/' + UM + '_X1_count_' + str(cc) + '_SpC_' + str(SpC) + '.npy')
@@ -169,16 +169,16 @@ def training_the_model(model,domain_adaptation_task,repetition,sample_per_class)
     y2 = np.load('./pairs/' + UM + '_y2_count_' + str(cc) + '_SpC_' + str(SpC) + '.npy')
     yc = np.load('./pairs/' + UM + '_yc_count_' + str(cc) + '_SpC_' + str(SpC) + '.npy')
 
-    y1 = np_utils.to_categorical(y1, nb_classes)
-    y2 = np_utils.to_categorical(y2, nb_classes)
+    y1 = to_categorical(y1, nb_classes)
+    y2 = to_categorical(y2, nb_classes)
 
-    print 'Training the model - Epoch '+str(epoch)
+    print('Training the model - Epoch '+str(epoch))
     nn=batch_size
     best_Acc = 0
     for e in range(epoch):
         if e % 10 == 0:
             printn(str(e) + '->')
-        for i in range(len(y2) / nn):
+        for i in range(int(len(y2) / nn)):
             loss = model.train_on_batch([X1[i * nn:(i + 1) * nn, :, :, :], X2[i * nn:(i + 1) * nn, :, :, :]],
                                         [y1[i * nn:(i + 1) * nn, :], yc[i * nn:(i + 1) * nn, ]])
             loss = model.train_on_batch([X2[i * nn:(i + 1) * nn, :, :, :], X1[i * nn:(i + 1) * nn, :, :, :]],
@@ -190,5 +190,6 @@ def training_the_model(model,domain_adaptation_task,repetition,sample_per_class)
 
         if best_Acc < Acc:
             best_Acc = Acc
-    print str(e)
+            print('best acc =', Acc)
+
     return best_Acc

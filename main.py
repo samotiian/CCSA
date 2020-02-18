@@ -1,7 +1,7 @@
 import Initialization
-from keras.layers import Activation, Dropout, Dense
-from keras.layers import Input, Lambda
-from keras.models import Model
+from tensorflow.compat.v2.keras.layers import Activation, Dropout, Dense
+from tensorflow.compat.v2.keras.layers import Input, Lambda
+from tensorflow.compat.v2.keras.models import Model
 
 # let's assume MNIST->USPS task.
 domain_adaptation_task = 'MNIST_to_USPS'   # USPS_to_MNIST is also another option.
@@ -53,7 +53,7 @@ model.compile(loss={'classification': 'categorical_crossentropy', 'CSA': Initial
 
 
 
-print 'Domain Adaptation Task: ' + domain_adaptation_task
+print('Domain Adaptation Task: ' + domain_adaptation_task)
 # let's create the positive and negative pairs using row data.
 # pairs will be saved in ./pairs directory
 sample_per_class=1
