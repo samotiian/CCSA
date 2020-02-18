@@ -11,7 +11,7 @@ def parse_args():
     storage = parser.add_argument_group(description='Args')
     storage.add_argument('--sample_per_class', type=int, default=1, help='Number of samples per class in target class')
     storage.add_argument('--repetition', type=int, default=1, help='Repetition number')
-    storage.add_argument('--gpu_id', type=int, default=0, help='GPU ud to use')
+    storage.add_argument('--gpu_id', type=str, default='0', help='GPU ud to use')
     storage.add_argument('--domain_adaptation_task', type=str, default='MNIST_to_USPS', help='Either "MNIST_to_USPS" or "USPS_to_MNIST"')
     return parser.parse_args()
 
