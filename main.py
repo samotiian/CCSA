@@ -3,6 +3,7 @@ from tensorflow.compat.v2.keras.layers import Activation, Dropout, Dense
 from tensorflow.compat.v2.keras.layers import Input, Lambda
 from tensorflow.compat.v2.keras.models import Model
 import argparse
+import tensorflow as tf
 
 
 def parse_args():
@@ -15,7 +16,25 @@ def parse_args():
     return parser.parse_args()
 
 
+def setup_gpu(gpu_id, verbose=True):
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        try:
+            gpu_ids = [int(s) for s in gpu_id.split(',')]
+            gpus = [gpus[i] for i in gpu_ids]
+            tf.config.experimental.set_visible_devices(gpus, 'GPU')
+            for gpu in gpus:
+                tf.config.experimental.set_memory_growth(gpu, True)
+            logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+            print("Found {} Physical GPUs, {} Logical GPU".format(len(gpus),len(logical_gpus)))
+            print("Using GPU {}".format(gpu_ids))
+        except RuntimeError as e:
+            # Visible devices must be set before GPUs have been initialized
+            print(e)
+
+
 def main(args):
+    setup_gpu(args.gpu_id)
 
     # Creating embedding function. This corresponds to the function g in the paper.
     # You may need to change the network parameters.
