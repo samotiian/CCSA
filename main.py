@@ -1,70 +1,90 @@
 import Initialization
-from keras.layers import Activation, Dropout, Dense
-from keras.layers import Input, Lambda
-from keras.models import Model
-
-# let's assume MNIST->USPS task.
-domain_adaptation_task = 'MNIST_to_USPS'   # USPS_to_MNIST is also another option.
-
-# let's run the experiments when 1 target sample per calss is available in training.
-# you can run the experiments for sample_per_class=1, ... , 7.
-sample_per_class = 1
-
-# Running the experiments for repetition 5. In the paper we reported the average acuracy.
-# We run the experiments for repetition=0,...,9 and take the average
-repetition = 2
+from tensorflow.compat.v2.keras.layers import Activation, Dropout, Dense
+from tensorflow.compat.v2.keras.layers import Input, Lambda
+from tensorflow.compat.v2.keras.models import Model
+import argparse
+import tensorflow as tf
 
 
-# Creating embedding function. This corresponds to the function g in the paper.
-# You may need to change the network parameters.
-model1=Initialization.Create_Model()
-
-# size of digits 16*16
-img_rows, img_cols = 16, 16
-input_shape = (img_rows, img_cols, 1)
-input_a = Input(shape=input_shape)
-input_b = Input(shape=input_shape)
-
-
-# number of classes for digits classification
-nb_classes = 10
-
-# Loss = (1-alpha)Classification_Loss + (alpha)CSA
-alpha = .25
-
-# Having two streams. One for source and one for target.
-processed_a = model1(input_a)
-processed_b = model1(input_b)
+def parse_args():
+    parser = argparse.ArgumentParser(description='CCSA domain adaptation')
+    storage = parser.add_argument_group(description='Args')
+    storage.add_argument('--sample_per_class', type=int, default=1, help='Number of samples per class in target class')
+    storage.add_argument('--repetition', type=int, default=1, help='Repetition number')
+    storage.add_argument('--gpu_id', type=str, default='0', help='GPU ud to use')
+    storage.add_argument('--domain_adaptation_task', type=str, default='MNIST_to_USPS', help='Either "MNIST_to_USPS" or "USPS_to_MNIST"')
+    return parser.parse_args()
 
 
-# Creating the prediction function. This corresponds to h in the paper.
-out1 = Dropout(0.5)(processed_a)
-out1 = Dense(nb_classes)(out1)
-out1 = Activation('softmax', name='classification')(out1)
+def setup_gpu(gpu_id, verbose=True):
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        try:
+            gpu_ids = [int(s) for s in gpu_id.split(',')]
+            gpus = [gpus[i] for i in gpu_ids]
+            tf.config.experimental.set_visible_devices(gpus, 'GPU')
+            for gpu in gpus:
+                tf.config.experimental.set_memory_growth(gpu, True)
+            logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+            print("Found {} Physical GPUs, {} Logical GPU".format(len(gpus),len(logical_gpus)))
+            print("Using GPU {}".format(gpu_ids))
+        except RuntimeError as e:
+            # Visible devices must be set before GPUs have been initialized
+            print(e)
 
 
-distance = Lambda(Initialization.euclidean_distance, output_shape=Initialization.eucl_dist_output_shape, name='CSA')(
-    [processed_a, processed_b])
-model = Model(inputs=[input_a, input_b], outputs=[out1, distance])
-model.compile(loss={'classification': 'categorical_crossentropy', 'CSA': Initialization.contrastive_loss},
-              optimizer='adadelta',
-              loss_weights={'classification': 1 - alpha, 'CSA': alpha})
+def main(args):
+    setup_gpu(args.gpu_id)
+
+    # Creating embedding function. This corresponds to the function g in the paper.
+    # You may need to change the network parameters.
+    model1=Initialization.Create_Model()
+
+    # size of digits 16*16
+    img_rows, img_cols = 16, 16
+    input_shape = (img_rows, img_cols, 1)
+    input_a = Input(shape=input_shape)
+    input_b = Input(shape=input_shape)
 
 
+    # number of classes for digits classification
+    nb_classes = 10
+
+    # Loss = (1-alpha)Classification_Loss + (alpha)CSA
+    alpha = .25
+
+    # Having two streams. One for source and one for target.
+    processed_a = model1(input_a)
+    processed_b = model1(input_b)
 
 
-print 'Domain Adaptation Task: ' + domain_adaptation_task
-# let's create the positive and negative pairs using row data.
-# pairs will be saved in ./pairs directory
-sample_per_class=1
-for repetition in range(10):
-    Initialization.Create_Pairs(domain_adaptation_task,repetition,sample_per_class)
-    Acc=Initialization.training_the_model(model,domain_adaptation_task,repetition,sample_per_class)
-
-    print('Best accuracy for {} target sample per class and repetition {} is {}.'.format(sample_per_class,repetition,Acc ))
+    # Creating the prediction function. This corresponds to h in the paper.
+    out1 = Dropout(0.5)(processed_a)
+    out1 = Dense(nb_classes)(out1)
+    out1 = Activation('softmax', name='classification')(out1)
 
 
+    distance = Lambda(Initialization.euclidean_distance, output_shape=Initialization.eucl_dist_output_shape, name='CSA')(
+        [processed_a, processed_b])
 
+    model = Model(inputs=[input_a, input_b], outputs=[out1, distance])
+    model.compile(loss={'classification': 'categorical_crossentropy', 'CSA': Initialization.contrastive_loss},
+                optimizer='adadelta',
+                loss_weights={'classification': 1 - alpha, 'CSA': alpha})
+
+
+    print('Domain Adaptation Task: ' + args.domain_adaptation_task)
+    # let's create the positive and negative pairs using row data.
+    # pairs will be saved in ./pairs directory
+    Initialization.Create_Pairs(args.domain_adaptation_task, args.repetition, args.sample_per_class)
+    Acc=Initialization.training_the_model(model, args.domain_adaptation_task, args.repetition, args.sample_per_class)
+
+    print('Best accuracy for {} target sample per class and repetition {} is {}.'.format(args.sample_per_class, args.repetition, Acc ))
+
+
+if __name__ == '__main__':
+    args = parse_args()
+    main(args)
 
 
 

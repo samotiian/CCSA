@@ -1,7 +1,17 @@
 # CCSA: "Unified Deep Supervised Domain Adaptation and Generalization" (ICCV 2017)
 
-## Requiremenrts
-keras and numpy
+## Changes from original repository
+This is a modified version of the [original repository](https://github.com/samotiian/CCSA). 
+We made the following modifications:
+- Upgrade code to Python 3.6 and Tensorflow 1.15
+- Add Conda environment
+- Externalise experiment parameters (now command line arguments)
+- Fix major bug in model training (the original version trained a model for 10 consequtive repetitions without resetting the model parameters. This gave the model 10x the expected data for training)
+
+## Requirements
+```
+conda env create -f environment.yml
+```
 
 ## Introduction
 
